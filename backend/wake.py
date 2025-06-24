@@ -4,6 +4,9 @@ import pyaudio
 import struct
 from dotenv import load_dotenv
 
+from backend.voice import listen_until_silence
+from backend.brain import process_command_async
+
 load_dotenv()  # Load environment variables from .env
 
 def detect_wake_word(keyword="jarvis"):
@@ -34,11 +37,17 @@ def detect_wake_word(keyword="jarvis"):
             result = porcupine.process(pcm_unpacked)
             if result >= 0:
                 print("Wake word detected!")
-                break
+                # Listen for command after wake word
+                print("Listening for your command...")
+                command = listen_until_silence()
+                print(f"Recognized command: {command}")
+                if command:
+                    process_command_async(command)
+                print("Listening for wake word...")
+    except KeyboardInterrupt:
+        print("Wake word listener stopped by user.")
     finally:
         audio_stream.stop_stream()
         audio_stream.close()
         pa.terminate()
         porcupine.delete()
-
-    return True

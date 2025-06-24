@@ -1,0 +1,131 @@
+body {
+  margin: 0;
+  font-family: 'Audiowide', Arial, sans-serif;
+  background: radial-gradient(ellipse at 60% 40%, #001a33 0%, #0f2027 100%);
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+.jarvis-root {
+  display: flex;
+  height: 100vh;
+}
+
+.jarvis-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: rgba(10, 20, 40, 0.85);
+  overflow: hidden;
+}
+.jarvis-label {
+  color: #00f2fe;
+  font-family: 'Audiowide', Arial, sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  margin-bottom: 18px;
+  margin-top: -10px;
+  text-shadow: 0 0 16px #00f2fe88, 0 0 2px #fff;
+}
+.jarvis-bg-glow {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 60% 40%, #00f2fe44 0%, #001a3344 60%, transparent 100%),
+              radial-gradient(circle at 20% 80%, #4facfe33 0%, transparent 70%);
+  filter: blur(32px) brightness(1.2);
+  animation: jarvis-bg-animate 10s ease-in-out infinite alternate;
+}
+
+@keyframes jarvis-bg-animate {
+  0% {
+    background-position: 60% 40%, 20% 80%;
+    filter: blur(32px) brightness(1.2);
+    
+  }
+  100% {
+    background-position: 65% 45%, 25% 75%;
+    filter: blur(40px) brightness(1.3);
+  }
+}
+
+.jarvis-audio-indicator {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222b36;
+  color: #00f2fe;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: 'Audiowide', Arial, sans-serif;
+  font-size: 1.1em;
+  box-shadow: 0 2px 16px #00f2fe33;
+  z-index: 100;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.voice-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px 0 8px 0;
+}
+
+.mic-btn {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 16px #00f2fe33;
+  cursor: pointer;
+  transition: box-shadow 0.2s, background 0.2s;
+  position: relative;
+  outline: none;
+}
+
+.mic-btn.listening {
+  background: linear-gradient(135deg, #ff512f 0%, #dd2476 100%);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 #ff512f55; }
+  70% { box-shadow: 0 0 0 16px #ff512f00; }
+  100% { box-shadow: 0 0 0 0 #ff512f00; }
+}
+
+.mic-icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+  background: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3s-3 1.34-3 3v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V23h2v-1.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>') no-repeat center/contain;
+}
+
+.listening-indicator {
+  margin-left: 16px;
+  color: #ff512f;
+  font-weight: bold;
+  font-family: 'Audiowide', Arial, sans-serif;
+  letter-spacing: 1px;
+  font-size: 1.1em;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

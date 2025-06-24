@@ -7,8 +7,8 @@ import os
 import pvporcupine
 import sounddevice as sd
 
-from voice import speak_async, stop_speaking, is_speaking, listen_until_silence_safe
-from brain import process_command_async
+from jarvis.backend.voice import speak_async, stop_speaking, is_speaking, listen_until_silence_safe
+from jarvis.backend.brain import process_command_async
 
 def get_random_acknowledgement() -> str:
     phrases = [

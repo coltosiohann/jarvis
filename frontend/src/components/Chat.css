@@ -1,0 +1,106 @@
+.jarvis-chat {
+  width: 440px;
+  max-width: 95vw;
+  background: rgba(10, 20, 40, 0.97);
+  border-radius: 18px;
+  box-shadow: 0 4px 32px #00f2fe33;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  border: 1.5px solid #00f2fe44;
+}
+
+.jarvis-chat-messages {
+  flex: 1;
+  padding: 24px 16px 8px 16px;
+  overflow-y: auto;
+  max-height: 180px; /* Reduced from 350px */
+}
+
+.jarvis-chat-message {
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 1.1em;
+  line-height: 1.4;
+  max-width: 80%;
+  word-break: break-word;
+  transition: background 0.2s;
+  font-family: 'Audiowide', Arial, sans-serif;
+}
+
+.jarvis-chat-message.jarvis {
+  background: linear-gradient(90deg, #00f2fe33, #4facfe22);
+  border: 1px solid #00f2fe88;
+  box-shadow: 0 0 12px #00f2fe44;
+  color: #00f2fe;
+}
+
+.jarvis-chat-message.user {
+  background: linear-gradient(90deg, #232526, #414345);
+  border: 1px solid #4facfe33;
+  color: #fff;
+  align-self: flex-end;
+}
+
+.jarvis-chat-input {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-top: 1px solid #223;
+  background: rgba(20, 30, 40, 0.95);
+  border-radius: 0 0 16px 16px;
+  gap: 8px;
+}
+
+.jarvis-chat-input input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #222b36;
+  color: #e0e0e0;
+  font-size: 1em;
+  outline: none;
+  font-family: 'Audiowide', Arial, sans-serif;
+}
+
+.jarvis-chat-input button {
+  background: linear-gradient(90deg, #00f2fe, #4facfe);
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'Audiowide', Arial, sans-serif;
+  margin-left: 0;
+  height: 40px;
+  min-width: 80px;
+  box-shadow: 0 0 8px #00f2fe55;
+}
+
+.jarvis-chat-input button:hover {
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+}
+
+.jarvis-agent-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0 0;
+  padding: 0 12px 12px 12px;
+  font-family: 'Audiowide', Arial, sans-serif;
+  color: #00f2fe;
+}
+
+.jarvis-agent-select select {
+  background: #222b36;
+  color: #00f2fe;
+  border: 1px solid #00f2fe88;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-family: 'Audiowide', Arial, sans-serif;
+  font-size: 1em;
+}

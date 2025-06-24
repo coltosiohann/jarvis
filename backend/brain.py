@@ -1,4 +1,3 @@
-# brain.py
 import threading
 from openai import OpenAI
 import os
@@ -13,10 +12,10 @@ if not OPENAI_API_KEY:
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-from voice import speak_async, stop_speaking
-from memory_manager import log_memory  # Memory integration
+from backend.voice import speak_async, stop_speaking
+from backend.memory_manager import log_memory
 
-def think(prompt: str) -> str:
+def think(prompt: str, model: str = "gpt-3.5-turbo") -> str:
     system_prompt = (
         "You are J.A.R.V.I.S., Tony Stark’s AI assistant, intelligent, calm, and articulate. "
         "You speak with a formal British tone, but can be witty and subtly sarcastic. "
@@ -31,7 +30,7 @@ def think(prompt: str) -> str:
 
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=model,
             messages=messages
         )
         answer = response.choices[0].message.content.strip()
@@ -40,13 +39,13 @@ def think(prompt: str) -> str:
         print(f"[OpenAI Error]: {e}")
         return "Sorry Sir, I am having trouble thinking right now."
 
-def process_command_async(prompt):
+def process_command_async(prompt, model: str = "gpt-3.5-turbo"):
     stop_speaking()
     speak_async("Thinking...")
 
     def think_and_speak():
         try:
-            response = think(prompt)
+            response = think(prompt, model=model)
             # Automatically log conversation to memory
             log_memory(f"User: {prompt}\nJARVIS: {response}")
         except Exception as e:

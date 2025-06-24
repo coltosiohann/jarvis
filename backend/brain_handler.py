@@ -1,7 +1,7 @@
 import os
 import datetime
 import webbrowser
-from voice import speak
+from jarvis.backend.voice import speak
 
 def handle_command(command):
     command = command.lower()

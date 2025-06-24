@@ -1,4 +1,3 @@
-# voice.py
 import time
 import threading
 import hashlib
@@ -8,12 +7,18 @@ import pygame
 import speech_recognition as sr
 from dotenv import load_dotenv
 
+# NEW: Local TTS
+import pyttsx3
+
 load_dotenv()
 
 API_KEY = os.getenv("ELEVENLABS_API_KEY")
 VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID")
 
-if not API_KEY or not VOICE_ID:
+# Set this to True to use local TTS (pyttsx3), False for ElevenLabs
+USE_LOCAL_TTS = True
+
+if not USE_LOCAL_TTS and (not API_KEY or not VOICE_ID):
     raise ValueError("Missing ElevenLabs API key or voice ID in .env")
 
 # Initialize pygame mixer for audio playback
@@ -48,10 +53,24 @@ def speak(text):
     text = text.strip()
     print(f"JARVIS: {text}")
 
+    if USE_LOCAL_TTS:
+        print("[DEBUG] Using local pyttsx3 TTS")
+        _speaking_flag = True
+        try:
+            engine = pyttsx3.init()
+            engine.say(text)
+            engine.runAndWait()
+        except Exception as e:
+            print("Local TTS error:", e)
+        finally:
+            _speaking_flag = False
+        return
+
     hash_name = hashlib.md5(text.encode()).hexdigest()
     filename = os.path.join(CACHE_FOLDER, f"{hash_name}.mp3")
 
     if not os.path.exists(filename):
+        print("[DEBUG] MP3 not cached, requesting from ElevenLabs...")
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
         headers = {
             "xi-api-key": API_KEY,
@@ -69,6 +88,7 @@ def speak(text):
             if response.status_code == 200:
                 with open(filename, "wb") as f:
                     f.write(response.content)
+                print("[DEBUG] MP3 saved to cache.")
             else:
                 print("ElevenLabs TTS Error:", response.status_code)
                 print("Response:", response.text)
@@ -76,16 +96,18 @@ def speak(text):
         except Exception as e:
             print("Error during TTS request:", e)
             return
+    else:
+        print("[DEBUG] MP3 loaded from cache.")
 
     try:
         with play_lock:
             sound = pygame.mixer.Sound(filename)
             _speaking_flag = True
             current_sound_channel = sound.play()
-
-        # Wait while speaking
+        print("[DEBUG] Playing audio...")
         while pygame.mixer.get_busy():
             time.sleep(0.1)
+        print("[DEBUG] Finished playing audio.")
     except Exception as e:
         print("Error during audio playback:", e)
     finally:

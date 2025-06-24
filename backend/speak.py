@@ -2,7 +2,7 @@ import time
 import speech_recognition as sr
 import threading
 
-from voice import speak, speak_async, stop_speaking, is_speaking
+from backend.voice import speak, speak_async, stop_speaking, is_speaking
 
 recognizer = sr.Recognizer()
 mic = sr.Microphone()
@@ -36,10 +36,11 @@ def listen_until_silence_safe():
 
 def process_command_async(prompt):
     stop_speaking()
+    print("[DEBUG] Calling speak_async('Thinking...')")
     speak_async("Thinking...")
 
     # import here to avoid circular import
-    from brain import think
+    from backend.brain import think
 
     def think_and_speak():
         try:
@@ -47,7 +48,9 @@ def process_command_async(prompt):
         except Exception as e:
             print("Error during think():", e)
             response = "Sorry Sir, I encountered an error."
+        print("[DEBUG] Calling speak(response)")
         speak(response)
+        print("[DEBUG] Finished speak(response)")
 
     thread = threading.Thread(target=think_and_speak, daemon=True)
     thread.start()

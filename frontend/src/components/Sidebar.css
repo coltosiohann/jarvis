@@ -1,0 +1,102 @@
+.jarvis-sidebar {
+  position: relative;
+  width: 42px;
+  min-width: 42px;
+  max-width: 220px;
+  background: rgba(10, 20, 40, 0.98);
+  border-right: 1px solid #00f2fe33;
+  box-shadow: 2px 0 16px #00f2fe22;
+  transition: width 0.35s cubic-bezier(.4,2,.6,1), min-width 0.35s cubic-bezier(.4,2,.6,1);
+  overflow: hidden;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100vh; /* Ensures sidebar takes full height */
+}
+
+.jarvis-sidebar.open {
+  width: 220px;
+  min-width: 220px;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 24px;
+  right: -18px;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #00f2fe 60%, #4facfe 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 12px #00f2fe88;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  border: 2px solid #001a33;
+  transition: right 0.35s;
+}
+
+.sidebar-toggle .arrow {
+  font-size: 1.5rem;
+  color: #001a33;
+  font-weight: bold;
+  user-select: none;
+}
+
+.jarvis-sidebar .sidebar-content {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  width: 220px;
+  padding: 32px 0 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%; /* Ensures content fills sidebar for footer placement */
+}
+
+.jarvis-sidebar.open .sidebar-content {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.jarvis-sidebar h2 {
+  color: #00f2fe;
+  font-family: 'Audiowide', Arial, sans-serif;
+  margin-bottom: 32px;
+  letter-spacing: 2px;
+}
+
+.jarvis-sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  width: 100%;
+}
+
+.jarvis-sidebar nav li {
+  padding: 12px 0;
+  text-align: center;
+  color: #e0e0e0;
+  cursor: pointer;
+  border-bottom: 1px solid #00f2fe22;
+  transition: background 0.2s, color 0.2s;
+  font-family: 'Audiowide', Arial, sans-serif;
+}
+
+.jarvis-sidebar nav li:hover {
+  background: #00f2fe22;
+  color: #00f2fe;
+}
+
+.jarvis-sidebar footer {
+  margin-top: auto;
+  color: #4facfe;
+  font-size: 0.9em;
+  opacity: 0.7;
+  width: 100%;
+  text-align: center;
+  padding-bottom: 12px;
+}
