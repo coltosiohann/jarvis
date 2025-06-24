@@ -1,12 +1,12 @@
-import os
+# voice.py
+import time
 import threading
 import hashlib
-import time
-import pygame
+import os
 import requests
+import pygame
 import speech_recognition as sr
 from dotenv import load_dotenv
-from brain import think  # use brain module for real thinking
 
 load_dotenv()
 
@@ -16,17 +16,14 @@ VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID")
 if not API_KEY or not VOICE_ID:
     raise ValueError("Missing ElevenLabs API key or voice ID in .env")
 
+# Initialize pygame mixer for audio playback
 pygame.mixer.init()
-
 CACHE_FOLDER = "tts_cache"
 os.makedirs(CACHE_FOLDER, exist_ok=True)
 
 current_sound_channel = None
 play_lock = threading.Lock()
 _speaking_flag = False
-
-recognizer = sr.Recognizer()
-mic = sr.Microphone()
 
 def stop_speaking():
     global current_sound_channel, _speaking_flag
@@ -36,6 +33,10 @@ def stop_speaking():
             current_sound_channel = None
         pygame.mixer.stop()
         _speaking_flag = False
+
+def is_speaking():
+    global _speaking_flag
+    return _speaking_flag
 
 def speak(text):
     global current_sound_channel, _speaking_flag
@@ -82,6 +83,7 @@ def speak(text):
             _speaking_flag = True
             current_sound_channel = sound.play()
 
+        # Wait while speaking
         while pygame.mixer.get_busy():
             time.sleep(0.1)
     except Exception as e:
@@ -95,8 +97,11 @@ def speak_async(text):
     thread = threading.Thread(target=speak, args=(text,), daemon=True)
     thread.start()
 
+# Speech recognition helper
+recognizer = sr.Recognizer()
+
 def listen_until_silence(timeout=10, phrase_time_limit=5):
-    with mic as source:
+    with sr.Microphone() as source:
         print("Adjusting for ambient noise, please wait...")
         recognizer.adjust_for_ambient_noise(source, duration=1)
         print("Listening... Please speak.")
@@ -116,21 +121,8 @@ def listen_until_silence(timeout=10, phrase_time_limit=5):
 
     return ""
 
-def process_command_async(prompt):
-    stop_speaking()
-    speak_async("Thinking...")
-
-    def think_and_speak():
-        try:
-            response = think(prompt)
-        except Exception as e:
-            print("Error during think():", e)
-            response = "Sorry Sir, I encountered an error."
-        speak(response)
-
-    thread = threading.Thread(target=think_and_speak, daemon=True)
-    thread.start()
-
-def is_speaking():
-    global _speaking_flag
-    return _speaking_flag
+def listen_until_silence_safe():
+    # Wait until speaking is finished before listening
+    while is_speaking():
+        time.sleep(0.1)
+    return listen_until_silence()

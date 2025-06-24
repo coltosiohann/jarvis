@@ -1,76 +1,20 @@
-import os
-import requests
+# brain.py
 import threading
-from playsound import playsound
-import uuid
-import hashlib
-import openai
+from openai import OpenAI
+import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
-# OpenRouter API setup
-OPENROUTER_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENROUTER_API_KEY:
-    raise ValueError("OPENROUTER_API_KEY not found in .env")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise ValueError("OPENAI_API_KEY not found in .env")
 
-client = openai.OpenAI(
-    api_key=OPENROUTER_API_KEY,
-    base_url="https://openrouter.ai/api/v1"
-)
+client = OpenAI(api_key=OPENAI_API_KEY)
 
-# ElevenLabs TTS setup
-ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID")
-if not ELEVENLABS_API_KEY or not VOICE_ID:
-    raise ValueError("ElevenLabs API key or Voice ID not found in .env")
-
-CACHE_FOLDER = "tts_cache"
-os.makedirs(CACHE_FOLDER, exist_ok=True)
-
-def speak(text):
-    if not text or not isinstance(text, str) or text.strip() == "":
-        print("Empty or invalid text, skipping TTS request.")
-        return
-
-    text = text.strip()
-    print(f"JARVIS: {text}")
-
-    hash_name = hashlib.md5(text.encode()).hexdigest()
-    filename = os.path.join(CACHE_FOLDER, f"{hash_name}.mp3")
-
-    if os.path.exists(filename):
-        playsound(filename)
-        return
-
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
-    headers = {
-        "xi-api-key": ELEVENLABS_API_KEY,
-        "Content-Type": "application/json"
-    }
-    data = {
-        "text": text,
-        "voice_settings": {
-            "stability": 0.5,
-            "similarity_boost": 0.75
-        }
-    }
-
-    try:
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code == 200:
-            with open(filename, "wb") as f:
-                f.write(response.content)
-            playsound(filename)
-        else:
-            print("ElevenLabs TTS Error:", response.status_code)
-            print("Response:", response.text)
-    except Exception as e:
-        print("Error during TTS request or playback:", e)
-
-def speak_async(text):
-    thread = threading.Thread(target=speak, args=(text,), daemon=True)
-    thread.start()
+from voice import speak_async, stop_speaking
+from memory_manager import log_memory  # Memory integration
 
 def think(prompt: str) -> str:
     system_prompt = (
@@ -87,23 +31,28 @@ def think(prompt: str) -> str:
 
     try:
         response = client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528-qwen3-8b:free",
+            model="gpt-3.5-turbo",
             messages=messages
         )
         answer = response.choices[0].message.content.strip()
         return answer
-
     except Exception as e:
-        print(f"[OpenRouter Error]: {e}")
-        return "Sorry, I'm having trouble thinking right now."
+        print(f"[OpenAI Error]: {e}")
+        return "Sorry Sir, I am having trouble thinking right now."
 
-def think_and_speak(prompt):
-    answer = think(prompt)
-    speak(answer)
-
-def ask_jarvis_async(prompt):
-    # Speak "Thinking..." immediately
+def process_command_async(prompt):
+    stop_speaking()
     speak_async("Thinking...")
-    # Then start background thread to think + speak actual answer
-    thread = threading.Thread(target=think_and_speak, args=(prompt,), daemon=True)
+
+    def think_and_speak():
+        try:
+            response = think(prompt)
+            # Automatically log conversation to memory
+            log_memory(f"User: {prompt}\nJARVIS: {response}")
+        except Exception as e:
+            print("Error during think():", e)
+            response = "Sorry Sir, I encountered an error."
+        speak_async(response)
+
+    thread = threading.Thread(target=think_and_speak, daemon=True)
     thread.start()
